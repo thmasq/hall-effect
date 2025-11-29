@@ -9,7 +9,7 @@
 use defmt::info;
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
-use esp_hal::analog::adc::{Adc, AdcConfig, Attenuation};
+use esp_hal::analog::adc::{Adc, AdcCalCurve, AdcConfig, Attenuation};
 use esp_hal::clock::CpuClock;
 use esp_hal::gpio::Level;
 use esp_hal::rmt::{PulseCode, Rmt, TxChannelConfig, TxChannelCreator};
@@ -100,7 +100,8 @@ async fn main(spawner: Spawner) -> ! {
     // Initialize ADC for hall effect sensor on GPIO4
     let mut adc_config = AdcConfig::new();
     let analog_pin = peripherals.GPIO4;
-    let mut adc_pin = adc_config.enable_pin(analog_pin, Attenuation::_11dB);
+    let mut adc_pin =
+        adc_config.enable_pin_with_cal::<_, AdcCalCurve<_>>(analog_pin, Attenuation::_6dB);
     let mut adc = Adc::new(peripherals.ADC1, adc_config);
 
     // Initialize RMT for WS2812 control
