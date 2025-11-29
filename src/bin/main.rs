@@ -6,7 +6,7 @@
               holding buffers for the duration of a data transfer."
 )]
 
-use defmt::info;
+use defmt::{Format, info};
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
 use esp_hal::analog::adc::{Adc, AdcCalCurve, AdcConfig, Attenuation};
@@ -17,10 +17,22 @@ use esp_hal::time::Rate;
 use esp_hal::timer::timg::TimerGroup;
 use nb;
 use panic_rtt_target as _;
-use smart_leds::RGB8;
 
 // This creates a default app-descriptor required by the esp-idf bootloader.
 esp_bootloader_esp_idf::esp_app_desc!();
+
+#[derive(Clone, Copy, Debug, PartialEq, Format)]
+pub struct RGB8 {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+}
+
+impl RGB8 {
+    pub fn new(r: u8, g: u8, b: u8) -> Self {
+        Self { r, g, b }
+    }
+}
 
 // WS2812 timing constants (in nanoseconds)
 const CODE_PERIOD_NS: u32 = 1250; // 800kHz
